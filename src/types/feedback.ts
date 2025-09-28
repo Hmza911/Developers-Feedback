@@ -13,12 +13,11 @@ export interface Feedback {
   createdAt: Date;
 }
 
-export interface CreateFeedbackRequest {
+export type CreateFeedbackRequest = {
   title: string;
   message: string;
-  tags: string[];
-}
-
+  tags?: string[];
+};
 export interface ReactionUpdate {
   feedbackId: string;
   type: 'like' | 'dislike';

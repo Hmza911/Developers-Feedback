@@ -4,6 +4,7 @@ import SkeletonCard from './SkeletonCard';
 import { Feedback } from '@/types/feedback';
 import { mockFeedbackData } from '@/lib/mockData';
 import toast from 'react-hot-toast';
+import useFeedbackStore from '@/stores/useFeedbackStore';
 
 interface FeedbackListProps {
   isLoggedIn?: boolean;
@@ -12,33 +13,17 @@ interface FeedbackListProps {
 const ITEMS_PER_PAGE = 6;
 
 const FeedbackList = ({ isLoggedIn = false }: FeedbackListProps) => {
+
+  const { fetchFeedbacks, loading, feedbacks } = useFeedbackStore();
+
+  useEffect(() => {
+    fetchFeedbacks();
+  }, [fetchFeedbacks]);
+
   const [feedback, setFeedback] = useState<Feedback[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(0);
   const observerTarget = useRef<HTMLDivElement>(null);
-
-  const loadMoreFeedback = useCallback(async () => {
-    if (loading || !hasMore) return;
-
-    setLoading(true);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const startIndex = page * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    const newFeedback = mockFeedbackData.slice(startIndex, endIndex);
-    
-    if (newFeedback.length === 0) {
-      setHasMore(false);
-    } else {
-      setFeedback(prev => [...prev, ...newFeedback]);
-      setPage(prev => prev + 1);
-    }
-    
-    setLoading(false);
-  }, [loading, hasMore, page]);
 
   const handleReaction = async (feedbackId: string, type: 'like' | 'dislike') => {
     try {
@@ -99,31 +84,13 @@ const FeedbackList = ({ isLoggedIn = false }: FeedbackListProps) => {
     }
   };
 
-  useEffect(() => {
-    loadMoreFeedback();
-  }, []);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
-          loadMoreFeedback();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (observerTarget.current) {
-      observer.observe(observerTarget.current);
-    }
-
-    return () => observer.disconnect();
-  }, [loadMoreFeedback, hasMore, loading]);
-
   return (
     <div className="space-y-6">
+      {loading && Array.from({ length: 3 }).map((_, index) => (
+        <SkeletonCard key={`skeleton-${index}`} />
+      ))}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {feedback.map((item) => (
+        {feedbacks.map((item) => (
           <FeedbackCard
             key={item.id}
             feedback={item}

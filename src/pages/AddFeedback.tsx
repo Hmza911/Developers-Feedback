@@ -9,39 +9,42 @@ import { Badge } from '@/components/ui/badge';
 import { X, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { CreateFeedbackRequest } from '@/types/feedback';
+import useFeedbackStore from '@/stores/useFeedbackStore';
 
 const AddFeedback = () => {
   const navigate = useNavigate();
+  const { addFeedback } = useFeedbackStore();
+
   const [formData, setFormData] = useState<CreateFeedbackRequest>({
     title: '',
     message: '',
-    tags: []
+    tags: [],
   });
   const [currentTag, setCurrentTag] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (field: keyof CreateFeedbackRequest, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const addTag = () => {
     const tag = currentTag.trim();
     if (tag && !formData.tags.includes(tag) && formData.tags.length < 5) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, tag]
+        tags: [...prev.tags, tag],
       }));
       setCurrentTag('');
     }
   };
 
   const removeTag = (tagToRemove: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
     }));
   };
 
@@ -70,7 +73,7 @@ const AddFeedback = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const error = validateForm();
     if (error) {
       toast.error(error);
@@ -80,19 +83,10 @@ const AddFeedback = () => {
     setIsSubmitting(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      
-      // Simulate random success/error for demo
-      const shouldSucceed = Math.random() > 0.1; // 90% success rate
-      
-      if (shouldSucceed) {
-        toast.success('Feedback submitted successfully!');
-        navigate('/');
-      } else {
-        throw new Error('Failed to submit feedback');
-      }
-    } catch (error) {
+      await addFeedback(formData);
+      toast.success('Feedback submitted successfully!');
+      navigate('/');
+    } catch (err) {
       toast.error('Failed to submit feedback. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -108,9 +102,10 @@ const AddFeedback = () => {
             Share your thoughts, suggestions, or report issues to help improve our platform.
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Title */}
             <div className="space-y-2">
               <Label htmlFor="title">Title *</Label>
               <Input
@@ -121,27 +116,25 @@ const AddFeedback = () => {
                 maxLength={100}
                 disabled={isSubmitting}
               />
-              <p className="text-sm text-muted-foreground">
-                {formData.title.length}/100 characters
-              </p>
+              <p className="text-sm text-muted-foreground">{formData.title.length}/100 characters</p>
             </div>
 
+            {/* Message */}
             <div className="space-y-2">
               <Label htmlFor="message">Message *</Label>
               <Textarea
                 id="message"
                 value={formData.message}
                 onChange={(e) => handleInputChange('message', e.target.value)}
-                placeholder="Describe your feedback in detail. What would you like to see improved or what issues are you experiencing?"
+                placeholder="Describe your feedback in detail"
                 rows={5}
                 maxLength={1000}
                 disabled={isSubmitting}
               />
-              <p className="text-sm text-muted-foreground">
-                {formData.message.length}/1000 characters
-              </p>
+              <p className="text-sm text-muted-foreground">{formData.message.length}/1000 characters</p>
             </div>
 
+            {/* Tags */}
             <div className="space-y-2">
               <Label htmlFor="tags">Tags (Optional)</Label>
               <div className="flex space-x-2">
@@ -163,7 +156,7 @@ const AddFeedback = () => {
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              
+
               {formData.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mt-3">
                   {formData.tags.map((tag, index) => (
@@ -183,22 +176,16 @@ const AddFeedback = () => {
                   ))}
                 </div>
               )}
-              
-              <p className="text-sm text-muted-foreground">
-                Add up to 5 tags to categorize your feedback
-              </p>
+
+              <p className="text-sm text-muted-foreground">Add up to 5 tags</p>
             </div>
 
-            <div className="flex space-x-4 pt-4">
+            {/* Actions */}
+           <div className="flex space-x-4 pt-4">
               <Button type="submit" disabled={isSubmitting} className="flex-1">
                 {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
               </Button>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate('/')}
-                disabled={isSubmitting}
-              >
+              <Button type="button" variant="outline" onClick={() => navigate('/')} disabled={isSubmitting}>
                 Cancel
               </Button>
             </div>
