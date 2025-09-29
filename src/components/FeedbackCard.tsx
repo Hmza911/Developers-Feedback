@@ -26,9 +26,7 @@ const FeedbackCard = ({ feedback, canDelete, onReaction, onDelete }: FeedbackCar
         setLocalReaction(null);
       } else {
         setLocalLikes(prev => prev + 1);
-        if (localReaction === 'dislike') {
-          setLocalDislikes(prev => prev - 1);
-        }
+        if (localReaction === 'dislike') setLocalDislikes(prev => prev - 1);
         setLocalReaction('like');
       }
     } else {
@@ -37,9 +35,7 @@ const FeedbackCard = ({ feedback, canDelete, onReaction, onDelete }: FeedbackCar
         setLocalReaction(null);
       } else {
         setLocalDislikes(prev => prev + 1);
-        if (localReaction === 'like') {
-          setLocalLikes(prev => prev - 1);
-        }
+        if (localReaction === 'like') setLocalLikes(prev => prev - 1);
         setLocalReaction('dislike');
       }
     }
@@ -56,13 +52,13 @@ const FeedbackCard = ({ feedback, canDelete, onReaction, onDelete }: FeedbackCar
 
   return (
     <Card
-      className="group transition-all duration-200 hover:shadow-lg hover:shadow-primary/10 animate-slide-up 
-      bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 
-      w-[420px] min-h-[180px] mx-auto"
+      className="group transition-all duration-200 hover:shadow-lg hover:shadow-primary/10 animate-slide-up
+      bg-white/10 backdrop-blur-md rounded-2xl border border-white/20
+      w-full sm:w-[320px] md:w-[380px] lg:w-[420px] min-h-[180px] mx-auto p-4 sm:p-5"
     >
       <CardHeader className="pb-2">
-        <div className="flex items-start justify-between">
-          <CardTitle className="text-lg font-semibold leading-tight line-clamp-2 text-white">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
+          <CardTitle className="text-base sm:text-lg md:text-lg font-semibold leading-tight line-clamp-2 text-white">
             {feedback.title}
           </CardTitle>
           {canDelete && (
@@ -70,14 +66,14 @@ const FeedbackCard = ({ feedback, canDelete, onReaction, onDelete }: FeedbackCar
               variant="ghost"
               size="sm"
               onClick={handleDelete}
-              className="opacity-0 group-hover:opacity-100 transition-opacity text-red-400 hover:text-red-500"
+              className="mt-2 sm:mt-0 opacity-0 group-hover:opacity-100 transition-opacity text-red-400 hover:text-red-500"
             >
               <Trash2 className="h-4 w-4" />
             </Button>
           )}
         </div>
         
-        <div className="flex items-center space-x-2 text-sm text-gray-300">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mt-1 text-xs sm:text-sm text-gray-300">
           <div className="flex items-center space-x-1">
             <User className="h-3 w-3" />
             <span>{feedback.title}</span>
@@ -87,21 +83,21 @@ const FeedbackCard = ({ feedback, canDelete, onReaction, onDelete }: FeedbackCar
       </CardHeader>
       
       <CardContent className="space-y-3">
-        <p className="text-gray-200 leading-relaxed line-clamp-3 text-sm">
+        <p className="text-gray-200 leading-relaxed line-clamp-3 text-sm sm:text-base">
           {feedback.message}
         </p>
         
         {feedback.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {feedback.tags.map((tag, index) => (
-              <Badge key={index} variant="secondary" className="text-xs bg-white/20 text-gray-100">
+              <Badge key={index} variant="secondary" className="text-xs sm:text-sm bg-white/20 text-gray-100">
                 {tag}
               </Badge>
             ))}
           </div>
         )}
         
-        <div className="flex items-center space-x-2 pt-1">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 pt-1">
           <Button
             variant="ghost"
             size="sm"
